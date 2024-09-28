@@ -1,0 +1,23 @@
+# Ignore Python compiled files
+*.pyc
+__pycache__/
+
+# Ignore virtual environments
+venv/
+.env/
+
+# Ignore build and distribution files
+build/
+dist/
+*.egg-info/
+src/*.egg-info/
+
+# Ignore IDE project files (e.g., VS Code, PyCharm)
+.vscode/
+.idea/
+
+# Ignore models and large files if necessary
+models/
+
+# others
+testcase_todo.md

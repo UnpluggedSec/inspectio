@@ -1,0 +1,4 @@
+spacy>=3.0.0
+PyYAML>=5.4.1
+argparse>=1.4.0
+fpdf>=1.7.2
