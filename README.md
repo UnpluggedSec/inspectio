@@ -20,26 +20,31 @@ Install it easily using pip:
 To install Inspectio manually, follow these steps:
 
 1. **Clone the Repository**:
-   ```bash
+   ```
    git clone https://github.com/unpluggedsec/inspectio.git
    cd inspectio
    ```
 
-2. **Install Required Packages: Ensure you have Python 3.6 or higher. Use pip to install dependencies:**
+2. **Build the package using below command:**
 
-    ```bash
-    pip install -r requirements.txt
+    ```
+    python setup.py bdist_wheel
+    ```
+2. **Install the wheel:**
+
+    ```
+    pip install ./dist/inspectio*.whl
     ```
 2. **Download Spacy model:**
 
-    ```bash
+    ```
     python -m spacy download en_core_web_trf
     ```
 4. **Run the Utility: You can now run the utility using the following command:**
 
-    ```bash
-    python inspectio.py --help
-    usage: Inspectio.py [-h] -l LOG [-f {json,raw,html}] [-o OUTPUT] [-r REGEX] [-i IGNORE]
+    ```
+    inspectio --help
+    usage: inspectio [-h] -l LOG [-f {json,raw,html}] [-o OUTPUT] [-r REGEX] [-i IGNORE]
 
     Secure Log Review Tool
 
@@ -62,27 +67,27 @@ Inspectio can be used from the command line with various options. Here are some 
 ### Normal Run
 To analyze a log file for sensitive data using the default regex patterns, use the following command:
 
-    ```python
-    python inspectio.py -l path/to/your/logfile.log
+    ```
+    inspectio -l path/to/your/logfile.log
     ```
 
 ### Ignore Patterns
-If you want to exclude certain patterns from the analysis, you can specify them using the -i option **(Line separated regexes)**:
+If you want to exclude certain patterns from the analysis (say log dates which might spam your output due to default regex detecting dates), you can provide them in a separate file (see samples in misc/ignore_patterns.txt) using the -i option **(Line separated regexes)**:
 
-    ```bash
-    python inspectio.py -l path/to/your/logfile.log -i path/to/ignore_patterns.yaml
+    ```
+    inspectio -l path/to/your/logfile.log -i path/to/ignore_patterns.yaml
     ```
 ### Additional Regex Patterns
-To include additional regex patterns for matching, you can provide them in a separate YAML file using the -r option **(Line separated regexes)**:
+To include additional regex patterns for matching, you can provide them in a separate file (see samples in misc/additional_patterns.txt) using the -r option **(Line separated regexes)**:
 
-    ```bash
-    python inspectio.py -l path/to/your/logfile.log -r path/to/additional_patterns.yaml
+    ```
+    inspectio -l path/to/your/logfile.log -r path/to/additional_patterns.yaml
     ```
 ### Example Command
 Combining options, here’s an example command that uses a logfile with specified ignore patterns and additional regex patterns:
 
-    ```bash
-    python inspectio.py -l path/to/your/logfile.log -i path/to/ignore_patterns.yaml -r path/to/additional_patterns.txt
+    ```
+    inspectio -l path/to/your/logfile.log -i path/to/ignore_patterns.yaml -r path/to/additional_patterns.txt
     ```
 
 ## Output Formats
@@ -95,8 +100,8 @@ Inspectio supports multiple output formats. You can specify the output format us
 Example:
 To output results in JSON format:
 
-    ```bash
-    python inspectio.py -l path/to/your/logfile.log -f json -o output.json
+    ```
+    inspectio -l path/to/your/logfile.log -f json -o output.json
     ```
 
 ## Contributing

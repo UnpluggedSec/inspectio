@@ -22,17 +22,36 @@ def spacy_model_install():
     try:
         # Attempt to download the spaCy model
         subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_trf"])
-        print("spaCy model 'en_core_web_trf' installed successfully.")
+        print(f"{datetime.now()}: spaCy model 'en_core_web_trf' installed successfully.")
         return True
     except subprocess.CalledProcessError as e:
         # Handle the case where the model download fails
-        print(f"Failed to install spaCy model: {e}")
+        print(f"{datetime.now()}: Failed to install spaCy model: {e}")
         return False
     except Exception as e:
         # Catch any other unexpected exceptions
-        print(f"An error occurred: {e}")
+        print(f"{datetime.now()}: An error occurred: {e}")
         return False
 
+def check_spacy_model_installation():
+   # Load spaCy model
+    print(f"{datetime.now()}: Loading AI Model")
+    try:
+        nlp = spacy.load('en_core_web_trf')
+        return nlp
+    except:
+        try:
+            print(f"{datetime.now()}: AI model loading failed. Attempting to install the model")
+            installation_output = spacy_model_install()
+            if installation_output:
+                print(f"\n\n{datetime.now()}: Installation successful. Rerun the script again")
+                sys.exit(0)
+            else:
+                print(f"{datetime.now()}: Installation failed. Install the model manually using : {sys.executable} -m spacy download en_core_web_trf")
+                sys.exit(0)
+        except Exception as e:
+            print(f"{datetime.now()}: AI Model loading failed - {e}. Aborting script execution. Verify the model installation using: {sys.executable} -m spacy validate. You may also install the model again using : {sys.executable} -m spacy download en_core_web_trf")
+            sys.exit(0)
 
 # Function to load regex from YAML file
 def load_regex_from_yaml(additional_regex_file):
@@ -48,7 +67,7 @@ def load_regex_from_yaml(additional_regex_file):
                     if name and regex:
                         regex_patterns[name] = regex
     except Exception as e:
-        print(f"Error loading Inbuilt regex file: {e}. Aborting the execution")
+        print(f"{datetime.now()}: Error loading Inbuilt regex file: {e}. Aborting the execution")
         sys.exit()
 
     try:
@@ -56,25 +75,25 @@ def load_regex_from_yaml(additional_regex_file):
             with open(additional_regex_file, 'r') as file2:
                 additional_patterns = [line.strip() for line in file2 if line.strip()]
                 if len(additional_patterns) <= 0:
-                    print(f"No patterns found in the additional regex file. Only default regex will be used")
+                    print(f"{datetime.now()}: No patterns found in the additional regex file. Only default regex will be used")
                     return regex_patterns  # Return original matches in case of error
                 for pattern in additional_patterns:
                     regex_patterns[f"custom_pattern_{(additional_patterns.index(pattern) + 1)}"] = pattern
-        print(f"{len(regex_patterns)} regexes loaded.")
+        print(f"{datetime.now()}: {len(regex_patterns)} regexes loaded.")
         return regex_patterns
     except:
-        print(f"Error parsing additionally parsed regex file. Only default regex will be used")
+        print(f"{datetime.now()}: Error parsing additionally parsed regex file. Please refer documentation. Only default regex will be used")
         return regex_patterns  # Return original matches in case of error
      
 
 def ignore_patterns_from_file(ignore_file, all_matches):
-    print("Ignore patterns supplied. Scanning the results and removing ignore patterns")
+    print(f"{datetime.now()}: Ignore patterns supplied. Scanning the results and removing ignore patterns")
     try:
         with open(ignore_file, 'r') as file:
             ignore_patterns = [line.strip() for line in file if line.strip()]  # Read non-empty lines
 
         if len(ignore_patterns) <= 0:
-            print(f"No patterns found in the file. All results will be returned")
+            print(f"{datetime.now()}: No patterns found in the file. All results will be returned")
             return all_matches  # Return original matches in case of error
 
         # Compile the ignore patterns into regex objects
@@ -88,12 +107,12 @@ def ignore_patterns_from_file(ignore_file, all_matches):
 
         return filtered_matches
     except Exception as e:
-        print(f"Error reading ignore patterns: {e}. All results will be returned")
+        print(f"{datetime.now()}: Error reading ignore patterns: {e}. All results will be returned")
         return all_matches  # Return original matches in case of error
 
 # Function to detect sensitive information using regex
 def detect_with_regex(logs, regex_patterns):
-    print("Regex Scanning initiated")
+    print(f"{datetime.now()}: Regex Scanning initiated")
     matches = []
     for i, line in enumerate(logs):
         for name, pattern in regex_patterns.items():
@@ -107,28 +126,13 @@ def detect_with_regex(logs, regex_patterns):
                         "log_snippet": line.strip()
                     })
             except re.error as e:
-                print(f"Regex error in category {name}: {e}")
+                print(f"{datetime.now()}: Regex error in category {name}: {e}")
     return matches
 
 # Function to detect sensitive information using spaCy model
-def detect_with_spacy(logs):
-    # Load spaCy model
-    print("Loading AI Model")
+def detect_with_spacy(logs,nlp):
     try:
-        nlp = spacy.load('en_core_web_trf')
-    except:
-        try:
-            print("AI model loading failed. Attempting to install the model")
-            installation_output = spacy_model_install()
-            if installation_output:
-                print("Installation successful. Refreshing and attempting to load the model again")
-                time.sleep(5)
-                nlp = spacy.load('en_core_web_trf')
-        except Exception as e:
-            print(f"AI Model loading failed - {e}. Results would only have regex output. Verify the model installation using: {sys.executable} -m spacy validate. You may also install the model again using : {sys.executable} -m spacy download en_core_web_trf")
-            return []
-    try:
-        print("Scanning using AI model")
+        print(f"{datetime.now()}: Scanning using AI model")
         matches = []
         # Define sensitive entity types
         sensitive_entity_types = {"PERSON", "NORP", "FAC", "ORG", "GPE", "LOC","DATE","CARDINAL"}
@@ -145,7 +149,7 @@ def detect_with_spacy(logs):
                     })
         return matches
     except:
-        print("Scanning with AI model failed. Results would only have regex output.")
+        print(f"{datetime.now()}: Scanning with AI model failed. Results would only have regex output.")
         return []
 
 # Function to save output in different formats
@@ -154,13 +158,13 @@ def save_output(matches, output_format, output_path):
         try:
             with open(output_path, 'w') as f:
                 json.dump(matches, f, indent=4)
-            print(f"Output saved to {output_path}")
+            print(f"{datetime.now()}: Output saved to {output_path}")
         except Exception as e:
-            print(f"Error saving JSON output: {e}")
+            print(f"{datetime.now()}: Error saving JSON output: {e}")
 
     elif output_format == 'html':
         try:
-            print("Generating HTML output")
+            print(f"{datetime.now()}: Generating HTML output")
             # Get current datetime for report generation
             report_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
@@ -246,10 +250,10 @@ def save_output(matches, output_format, output_path):
             with open(output_path, 'w') as file:
                 file.write(html_content)
             
-            print(f"HTML report successfully saved to {output_path}")
+            print(f"{datetime.now()}: HTML report successfully saved to {output_path}")
         
         except Exception as e:
-            print(f"Error generating HTML report: {e}")
+            print(f"{datetime.now()}: Error generating HTML report: {e}")
 
 
     else:
@@ -263,19 +267,19 @@ def save_output(matches, output_format, output_path):
         if output_path:
             with open(output_path, 'w') as file:
                 file.write(raw_output)
-            print(f"Output saved to {output_path}")
+            print(f"{datetime.now()}: Output saved to {output_path}")
         else:
             print("\n\n")
             print(raw_output)
 
 # Main function to process log files
-def process_log_file(input_file, output_format, output_path, regex_yaml,ignore_regex):
+def process_log_file(input_file, output_format, output_path, regex_yaml,ignore_regex,model):
     try:
-        print("Scanning Log file")
+        print(f"{datetime.now()}: Scanning Log file")
         with open(input_file, 'r') as file:
             logs = file.readlines()
     except FileNotFoundError:
-        print(f"Error: File {input_file} not found.")
+        print(f"{datetime.now()}: Error: File {input_file} not found.")
         return
 
     # Load regex patterns
@@ -285,7 +289,7 @@ def process_log_file(input_file, output_format, output_path, regex_yaml,ignore_r
     regex_matches = detect_with_regex(logs, regex_patterns)
     
     # Detect sensitive info with spaCy
-    spacy_matches = detect_with_spacy(logs)
+    spacy_matches = detect_with_spacy(logs,model)
     
     # Combine matches
     all_matches = regex_matches + spacy_matches
@@ -337,10 +341,12 @@ def main():
     args = parser.parse_args()
     
     if (args.format == 'html' and not args.output) or (args.format == 'json' and not args.output):
-        print("Error: Output file path is required for HTML/Json formats.")
+        print(f"{datetime.now()}: Error: Output file path is required for HTML/Json formats.")
         return
     
-    process_log_file(args.log, args.format, args.output, args.regex,args.ignore)
+    model = check_spacy_model_installation()
+    
+    process_log_file(args.log, args.format, args.output, args.regex,args.ignore,model)
 
 if __name__ == '__main__':
     main()

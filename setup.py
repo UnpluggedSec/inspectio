@@ -17,15 +17,9 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/unpluggedsec/inspectio.git",  # GitHub or project URL
-    packages=find_packages(where='src'), #(where='src')
-    # package_dir={},
-    include_package_data=True,  # This is key to including non-code files
-    # py_modules=["inspectio"],             # Directly include the inspectio module
+    packages=find_packages(where='src'), 
+    include_package_data=True,  
     package_dir={"": "src"},              # Packages and modules are in src/
-    # include_package_data=True,            # Include non-Python files
-    # package_data={
-    #     '': ['patterns.yaml'],            # Include the YAML file in the package
-    # },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: Other/Proprietary License",
