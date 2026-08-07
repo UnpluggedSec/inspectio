@@ -11,7 +11,7 @@ import sys
 
 setup(
     name="inspectio", 
-    version="1.0",
+    version="1.0.1",
     author="Ayman Abdul Kareem",
     description="A secure log review tool that detects sensitive data using regex and spaCy",
     long_description=long_description,
