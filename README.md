@@ -1,5 +1,7 @@
 # Inspectio
 
+> **⚠️ Archived:** This project is no longer maintained here. Development has moved to [GrePII](https://github.com/DefenTorre/GrePII/) — please head there for the latest version, issues, and releases.
+
 ## Overview
 
 **Inspectio** is a powerful utility designed to help security assessors and penetration testers analyze logs for sensitive information. By leveraging regular expressions, it efficiently identifies and extracts potentially sensitive data, aiding in compliance and security assessments.
